@@ -67,7 +67,7 @@ SENSITIVE_WORDS = %w{
 	def
 	ghi
 	dada.com
-    pope.com
+	pope.com
 }
 ```
 
