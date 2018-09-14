@@ -1,0 +1,203 @@
+html {
+    height: 100%;
+    overflow-x: hidden;
+}
+body {
+    height: 100%;
+    margin: 0px;
+    background-color: #6f0606;
+}
+.topbar {
+    background-color: #060606;
+    height: 8%;
+}
+.topbar div {
+    padding-left: 15%;
+    top: 20%;
+    position: relative;
+    color: white;
+    font-size: 35px;
+    font-weight: 500;
+}
+.topbar div span {
+    font-size: 25px;
+    font-weight: 400;
+}
+.main {
+    height: 92%;
+    margin: auto;
+    width: 70%;
+}
+.stats-container {
+    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    height: 20%;
+}
+.stats-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 22%;
+    height: 90%;
+    background-color: #060606;
+    border-radius: 7px;
+}
+.stats-text {
+    font-size: 25px;
+    color: white;
+}
+.vul-finding{
+    color: white;
+    font-size: 25px;
+    margin: 15px 0px 0px 0px;
+}
+.list-container {
+    width: 100%;
+    height: 65%;
+    margin-top: 5px;
+}
+.list-head {
+    width: 100%;
+    text-align: left;
+    font-size: 25px;
+    color: white;
+    height: 10%;
+}
+.list-body{
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 90%;
+}
+
+a {color: white;}
+
+.list-row {
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+    color: white;
+    background-color: rgba(43, 62, 80, 1);
+    cursor: pointer;
+}
+.list-row:hover {background-color: rgba(158, 205, 251, 1);}
+.last-clicked{border: #e67a00 4px dashed}
+.active {background-color: rgba(67, 109, 150, 1);}
+.col-1 {
+    display: inline-block;
+    width: 15%;
+    padding: 7px 0px 7px 10px;
+}
+.col-2 {
+    display: inline-block;
+    width: 30%;
+    padding: 7px 0px 7px 0px;
+}
+.col-3 {
+    display: inline-block;
+    width: 25%;
+    padding: 7px 0px 7px 0px;
+}
+.col-4 {
+    display: inline-block;
+    width: 25%;
+    padding: 7px 0px 7px 0px;
+}
+#show-details {
+    position: fixed;
+    display:none;
+    height: 90%;
+    width: 60%;
+    background-color: rgba(43, 62, 80, 1);
+    border-radius: 10px;
+    top: 5%;
+    left: 20%;
+    z-index: 1000;
+}
+.content-head {
+    font-size: 30px;
+    color: white;
+    background-color: #6f0606;
+    border-radius: 10px;
+    padding: 10px 0px 10px 20px;
+}
+.content-body{
+    margin: 25px 10px 10px 20px;
+    height: 90%;
+    width: calc(100% - 25px);
+    overflow-y: auto;
+}
+.blob-container{
+    margin: 5px 0px 5px 0px;
+}
+.blob-head {
+    line-height: 30px;
+    color: white;
+    font-size: 16px;
+}
+.github-button {
+    margin: 10px 5px 10px 0px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    font-size: 15px;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.github-button:hover{
+    opacity: 0.8;
+}
+.github-commit {
+    width: 100px;
+    height: 50px;
+    display: inline-block;
+    background-color: white;
+}
+.line-no {
+    font-size: 10px;
+    margin: 15px 20px 5px 20px;
+    color: white;
+}
+.code-snippet {
+    overflow-x: auto;
+    margin: 10px 20px 20px 20px;
+    padding: 10px 20px 10px 20px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+}
+.description {
+    color: white;
+    font-size: 20px;
+}
+.blob-split {
+    margin: 40px 10px 40px 0px;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid black;
+}
+#mask {
+    position: fixed;
+    display: none;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 999;
+}
+::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background-color: rgba(43, 62, 80, 1);
+}
+::-webkit-scrollbar-thumb {
+    background-color: #666666;
+    border-radius: 5px;
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHunter</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script>
+      <%= @template_js %>
+    </script>
+    <style>
+      <%= @template_css %>
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div>GitHunter</div>
+    </div>
+    <div class="main">
+      <div class="stats-container">
+        <div class="stats-box">
+          <div class="stats-text"><%= @user_count %></div>
+          <div class="stats-text">Users</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-text"><%= @repo_count %></div>
+          <div class="stats-text">Repositories</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-text"><%= @blob_count %></div>
+          <div class="stats-text">Blobs</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-text"><%= @finding_count %></div>
+          <div class="stats-text">Findings</div>
+        </div>
+      </div>
+      <div class="vul-repo">Repositories with suspicious findings :</div>
+      <div class="list-container">
+        <div class="list-head">
+          <div class="col-1">User</div>
+          <div class="col-2">Nickname</div>
+          <div class="col-3">Repository</div>
+          <div class="col-4">Link</div>
+        </div>
+        <div class="list-body">
+          <% @result.each_with_index do |repo, i| %>
+            <div class="list-row <%= i % 2 == 1 ? '' : 'active' %>" onclick="showDetails(event);">
+              <div class="col-1"><%= repo.user.github_user_name %></div>
+              <div class="col-2"><%= repo.user.nickname %></div>
+              <div class="col-3"><%= repo.repo_name %></div>
+              <div class="col-4"><a target="_blank" rel="noopener noreferrer" href="<%= ['https://github.com', repo.user.github_user_name, repo.repo_name].join('/') %>"><%= ['https://github.com', repo.user.github_user_name, repo.repo_name].join('/') %></a></div>
+              <div class="content" style="display:none;">
+                <div class="content-head">Findings in <%= repo.user.github_user_name %>/<%= repo.repo_name %>,  Nickname: <%= repo.user.nickname %></div>
+                <div class="content-body">
+                  <% repo.blobs.each do |blob| %>
+                    <div class="blob-container">
+                      <div class="blob-head">
+                        File:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;<span style="background-color:#6f0606"><%= blob.file_path %></span>
+                        <br>SHA:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<%= blob.sha%>
+                        <br>Earliest Commit:&emsp;&nbsp;&nbsp;<%= blob.earliest_commit_sha %>
+                      </div>
+                      <div>
+                        <div class="github-button" style="background-color:#e67a00;color:white;width:170px;" onclick="window.open('https://github.com/<%= [repo.user.github_user_name, repo.repo_name, 'blob', blob.earliest_commit_sha, blob.file_path].join('/') %>');">View file on GitHub</div>
+                        <div class="github-button" style="background-color:#bdbdbd;color:black;width:200px;" onclick="window.open('https://github.com/<%= [repo.user.github_user_name, repo.repo_name, 'commit', blob.earliest_commit_sha].join('/') %>');">View commit on Github</div>
+                      </div>
+                      <div class="blob-body">
+                        <% blob.findings.each do |finding| %>
+                          <% if finding.description.nil? %>
+                            <div class="line-no">Line <%= finding.line_no %> :</div>
+                            <div class="code-snippet">
+                              <%= get_snippet(finding.content, finding.marks) %>
+                            </div>
+                          <% else %>
+                            <div class="description">This file is a <%= finding.description %></div>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  <hr class="blob-split">
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div id="show-details"></div>
+      <div id="mask" onclick="closeDetails(event);"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GitHunter</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <script>
+      <%= @template_js %>
+    </script>
+    <style>
+      <%= @template_css %>
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div>GitHunter <span>Global Search</span></div>
+    </div>
+    <div class="main">
+      <div class="stats-container">
+        <div class="stats-box">
+          <div class="stats-text"><%= @global_findings.group(:github_user_name).uniq.count %></div>
+          <div class="stats-text">Users</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-text"><%= @global_findings.group(:repo_name).uniq.count %></div>
+          <div class="stats-text">Repositories</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-text"><%= @words.count %></div>
+          <div class="stats-text">Words</div>
+        </div>
+        <div class="stats-box">
+          <div class="stats-text"><%= @global_findings.count %></div>
+          <div class="stats-text">Global Findings</div>
+        </div>
+      </div>
+      <div class="vul-finding">New findings on Github after last searching :</div>
+      <div class="list-container">
+        <div class="list-head">
+          <div class="col-1">Words</div>
+          <div class="col-2">Total on Github</div>
+          <div class="col-3">In local DB</div>
+          <div class="col-4">Updated at</div>
+        </div>
+        <div class="list-body">
+          <% @words.each_with_index do |word, i| %>
+            <div class="list-row <%= i % 2 == 1 ? '' : 'active' %>" onclick="showDetails(event);">
+              <div class="col-1"><%= word.sensitive_word %></div>
+              <div class="col-2"><%= word.count %></div>
+              <div class="col-3"><%= word.global_findings.count %></div>
+              <div class="col-4"><%= word.updated_at.strftime('%Y-%m-%d') %></div>
+              <div class="content" style="display:none;">
+                <div class="content-head">Global findings contains word '<%= word.sensitive_word %>'</div>
+                <div class="content-body">
+                  <% word.global_findings.each do |finding| %>
+                    <div class="blob-container">
+                      <div class="blob-head">
+                        Github User:&emsp;&emsp;&emsp;&nbsp;<%= finding.github_user_name %>
+                        <br>Repository:&emsp;&emsp;&emsp;&emsp;<%= finding.repo_name %>
+                        <br>File:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;<span style="background-color:#6f0606"><%= finding.path %></span>
+                        <br>SHA:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<%= finding.blob_sha%>
+                      </div>
+                      <div>
+                        <div class="github-button" style="background-color:#e67a00;color:white;width:170px;" onclick="window.open('<%= finding.url %>');">View file on GitHub</div>
+                      </div>
+                      <div class="blob-body">
+                        <div class="code-snippet">
+                          <%= get_snippet(finding.content, finding.marks) %>
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="blob-split">
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div id="show-details"></div>
+      <div id="mask" onclick="closeDetails(event);"></div>
+    </div>
+  </body>
+</html>

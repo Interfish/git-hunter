@@ -1,0 +1,7 @@
+reports
+repos
+.DS_Store
+Gemfile.lock
+*.sqlite3
+user_list.txt
+config.rb

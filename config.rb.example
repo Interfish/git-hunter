@@ -1,0 +1,426 @@
+module GitHunterConfig
+  GITHUB_OAUTH_TOKEN = ''.freeze # need a github account token to work
+  SKIPPABLE_FILE_SIZE = 307200.freeze
+  SKIPPABLE_REPO = %w{
+  }
+  SKIPPABLE_DIR = %w{
+    node_modules/
+    vendor/bundle
+    vendor/cache
+    packge.json
+    yarn.lock
+    composer.lock
+    db.json
+    .css
+    yarn-error.log
+    .pbxproj
+    .svcinfo
+  }.freeze
+  LINES_EACH_BLOCK = 3.freeze
+  SHANNON_ENTROPHY_THRESHOLD = 8.freeze
+  MIN_BLOCK_LEN_SKIPPABLE = 1000.freeze
+  SENSITIVE_WORDS = %w{
+    example
+    google
+    facebook
+    microsoft
+  }.freeze
+  KEY_WORDS = [
+    %r{key['"]?\s{0,5}(:|=>|=|==)\s{0,5}['"]?[a-z0-9A-Z_@]{10,50}\W}i,
+    %r{\Waccount\W}i,
+    %r{\Wuser\W}i,
+    %r{\Wuname\W}i,
+    %r{\Wuser_?name\W}i,
+    %r{\Waws\W}i,
+    %r{\Wsecret\W}i,
+    %r{\Wsecret['"]?\s{0,5}(:|=>|=|==)\s{0,5}['"]?[a-z0-9A-Z_@]{4,50}}i,
+    %r{\Wserver\W}i,
+    %r{\Wrsa\W}i,
+    %r{\Wlogin\W}i,
+    %r{\Wpassw(or)?d\W}i,
+    %r{\Wpassw(or)?d['"]?\s{0,5}(:|=>|=|==)\s{0,5}['"]?[a-z0-9A-Z_@]{4,50}\W}i,
+    %r{\Wpass_?phrase\W}i,
+    %r{\Wpass_?phrase['"]?\s{0,5}(:|=>|=|==)\s{0,5}['"]?[a-z0-9A-Z_@]{4,50}\W}i,
+    %r{\Wtoken\W}i,
+    %r{\Wauth\W}i,
+    %r{\Wauthenticat(e|ion)\W}i,
+    %r{\Wip\W}i,
+    %r{\Wapi\W}i,
+    %r{\W("\|')?(aws)?_?(secret)?_?(access)?_?(key)(\"|')?\s*(:|=>|=|==)\s*(\"|')?[A-Za-z0-9/\+=]{40}("\|')?\W}i,
+    %r{\W(\"|')?(aws)?_?(account)_?(id)?(\"|')?\s*(:|=>|=)\s*("\|')?[0-9]{4}\-?[0-9]{4}\-?[0-9]{4}("\|')?\W}i,
+  ].freeze
+  SUSPECTIBLE_FILE_PATTERN = [
+    {
+      pattern: /.pem$/,
+      description: "Potential cryptographic private key"
+    },
+    {
+      pattern: /.log$/,
+      description: "Log file"
+    },
+    {
+      pattern: /.pkcs12$/,
+      description: "Potential cryptographic key bundle"
+    },
+    {
+      pattern: /.p12$/,
+      description: "Potential cryptographic key bundle"
+    },
+    {
+      pattern: /.pfx$/,
+      description: "Potential cryptographic key bundle"
+    },
+    {
+      pattern: /.asc$/,
+      description: "Potential cryptographic key bundle"
+    },
+    {
+      pattern: /otr.private_key$/,
+      description: "Pidgin OTR private key"
+    },
+    {
+      pattern: /.ovpn$/,
+      description: "OpenVPN client configuration file"
+    },
+    {
+      pattern: /.cscfg$/,
+      description: "Azure service configuration schema file"
+    },
+    {
+      pattern: /.rdp$/,
+      description: "Remote Desktop connection file"
+    },
+    {
+      pattern: /.mdf$/,
+      description: "Microsoft SQL database file"
+    },
+    {
+      pattern: /.sdf$/,
+      description: "Microsoft SQL server compact database file"
+    },
+    {
+      pattern: /.sqlite$/,
+      description: "SQLite database file"
+    },
+    {
+      pattern: /.bek$/,
+      description: "Microsoft BitLocker recovery key file"
+    },
+    {
+      pattern: /.tpm$/,
+      description: "Microsoft BitLocker Trusted Platform Module password file"
+    },
+    {
+      pattern: /.fve$/,
+      description: "Windows BitLocker full volume encrypted data file"
+    },
+    {
+      pattern: /.jks$/,
+      description: "Java keystore file"
+    },
+    {
+      pattern: /.psafe3$/,
+      description: "Password Safe database file"
+    },
+    {
+      pattern: /secret_token.rb$/,
+      description: "Ruby On Rails secret token configuration file"
+    },
+    {
+      pattern: /carrierwave.rb$/,
+      description: "Carrierwave configuration file"
+    },
+    {
+      pattern: /database.yml$/,
+      description: "Potential Ruby On Rails database configuration file"
+    },
+    {
+      pattern: /omniauth.rb$/,
+      description: "OmniAuth configuration file"
+    },
+    {
+      pattern: /settings.py$/,
+      description: "Django configuration file"
+    },
+    {
+      pattern: /.agilekeychain$/,
+      description: "1Password password manager database file"
+    },
+    {
+      pattern: /.keychain$/,
+      description: "Apple Keychain database file"
+    },
+    {
+      pattern: /.pcap$/,
+      description: "Network traffic capture file"
+    },
+    {
+      pattern: /.gnucash$/,
+      description: "GnuCash database file"
+    },
+    {
+      pattern: /jenkins.plugins.publish_over_ssh.BapSshPublisherPlugin.xml$/,
+      description: "Jenkins publish over SSH plugin file"
+    },
+    {
+      pattern: /credentials.xml$/,
+      description: "Potential Jenkins credentials file"
+    },
+    {
+      pattern: /.kwallet$/,
+      description: "KDE Wallet Manager database file"
+    },
+    {
+      pattern: /LocalSettings.php$/,
+      description: "Potential MediaWiki configuration file"
+    },
+    {
+      pattern: /.tblk$/,
+      description: "Tunnelblick VPN configuration file"
+    },
+    {
+      pattern: /Favorites.plist$/,
+      description: "Sequel Pro MySQL database manager bookmark file"
+    },
+    {
+      pattern: /configuration.user.xpl$/,
+      description: "Little Snitch firewall configuration file"
+    },
+    {
+      pattern: /.dayone$/,
+      description: "Day One journal file"
+    },
+    {
+      pattern: /journal.txt$/,
+      description: "Potential jrnl journal file"
+    },
+    {
+      pattern: /knife.rb$/,
+      description: "Chef Knife configuration file"
+    },
+    {
+      pattern: /proftpdpasswd$/,
+      description: "cPanel backup ProFTPd credentials file"
+    },
+    {
+      pattern: /robomongo.json$/,
+      description: "Robomongo MongoDB manager configuration file"
+    },
+    {
+      pattern: /filezilla.xml$/,
+      description: "FileZilla FTP configuration file"
+    },
+    {
+      pattern: /recentservers.xml$/,
+      description: "FileZilla FTP recent servers file"
+    },
+    {
+      pattern: /ventrilo_srv.ini$/,
+      description: "Ventrilo server configuration file"
+    },
+    {
+      pattern: /terraform.tfvars$/,
+      description: "Terraform variable config file"
+    },
+    {
+      pattern: /.exports$/,
+      description: "Shell configuration file"
+    },
+    {
+      pattern: /.functions$/,
+      description: "Shell configuration file"
+    },
+    {
+      pattern: /.extra$/,
+      description: "Shell configuration file"
+    },
+    {
+      pattern: /^.*_rsa$/,
+      description: "Private SSH key"
+    },
+    {
+      pattern: /^.*_dsa$/,
+      description: "Private SSH key"
+    },
+    {
+      pattern: /^.*_ed25519$/,
+      description: "Private SSH key"
+    },
+    {
+      pattern: /^.*_ecdsa$/,
+      description: "Private SSH key"
+    },
+    {
+      pattern: /\.?ssh\/config$/,
+      description: "SSH configuration file"
+    },
+    {
+      pattern: /^key(pair)?$/,
+      description: "Potential cryptographic private key"
+    },
+    {
+      pattern: /^\.?(bash_|zsh_|sh_|z)?history$/,
+      description: "Shell command history file"
+    },
+    {
+      pattern: /^\.?mysql_history$/,
+      description: "MySQL client command history file"
+    },
+    {
+      pattern: /^\.?psql_history$/,
+      description: "PostgreSQL client command history file"
+    },
+    {
+      pattern: /^\.?pgpass$/,
+      description: "PostgreSQL password file"
+    },
+    {
+      pattern: /^\.?irb_history$/,
+      description: "Ruby IRB console history file"
+    },
+    {
+      pattern: /\.?purple\/accounts\.xml$/,
+      description: "Pidgin chat client account configuration file"
+    },
+    {
+      pattern: /\.?xchat2?\/servlist_?\.conf$/,
+      description: "Hexchat/XChat IRC client server list configuration file"
+    },
+    {
+      pattern: /\.?irssi\/config$/,
+      description: "Irssi IRC client configuration file"
+    },
+    {
+      pattern: /\.?recon-ng\/keys\.db$/,
+      description: "Recon-ng web reconnaissance framework API key database"
+    },
+    {
+      pattern: /^\.?dbeaver-data-sources.xml$/,
+      description: "DBeaver SQL database manager configuration file"
+    },
+    {
+      pattern: /^\.?muttrc$/,
+      description: "Mutt e-mail client configuration file"
+    },
+    {
+      pattern: /^\.?s3cfg$/,
+      description: "S3cmd configuration file"
+    },
+    {
+      pattern: /\.?aws\/credentials$/,
+      description: "AWS CLI credentials file"
+    },
+    {
+      pattern: /^sftp-config(\.json)?$/,
+      description: "SFTP connection configuration file"
+    },
+    {
+      pattern: /^\.?trc$/,
+      description: "T command-line Twitter client configuration file"
+    },
+    {
+      pattern: /^\.?gitrobrc$/,
+      description: "Well, this is awkward... Gitrob configuration file"
+    },
+    {
+      pattern: /^\.?(bash|zsh|csh)rc$/,
+      description: "Shell configuration file"
+    },
+    {
+      pattern: /^\.?(bash_|zsh_)?profile$/,
+      description: "Shell profile configuration file"
+    },
+    {
+      pattern: /^\.?(bash_|zsh_)?aliases$/,
+      description: "Shell command alias configuration file"
+    },
+    {
+      pattern: /config(\.inc)?\.php$/,
+      description: "PHP configuration file"
+    },
+    {
+      pattern: /^key(store|ring)$/,
+      description: "GNOME Keyring database file"
+    },
+    {
+      pattern: /^kdbx?$/,
+      description: "KeePass password manager database file"
+    },
+    {
+      pattern: /^sql(dump)?$/,
+      description: "SQL dump file"
+    },
+    {
+      pattern: /^\.?htpasswd$/,
+      description: "Apache htpasswd file"
+    },
+    {
+      pattern: /^(\.|_)?netrc$/,
+      description: "Configuration file for auto-login process"
+    },
+    {
+      pattern: /\.?gem\/credentials$/,
+      description: "Rubygems credentials file"
+    },
+    {
+      pattern: /^\.?tugboat$/,
+      description: "Tugboat DigitalOcean management tool configuration"
+    },
+    {
+      pattern: /doctl\/config.yaml$/,
+      description: "DigitalOcean doctl command-line client configuration file"
+    },
+    {
+      pattern: /^\.?git-credentials$/,
+      description: "git-credential-store helper credentials file"
+    },
+    {
+      pattern: /config\/hub$/,
+      description: "GitHub Hub command-line client configuration file"
+    },
+    {
+      pattern: /^\.?gitconfig$/,
+      description: "Git configuration file"
+    },
+    {
+      pattern: /\.?chef\/(.*)\.pem$/,
+      description: "Chef private key"
+    },
+    {
+      pattern: /etc\/shadow$/,
+      description: "Potential Linux shadow file"
+    },
+    {
+      pattern: /etc\/passwd$/,
+      description: "Potential Linux passwd file"
+    },
+    {
+      pattern: /^\.?dockercfg$/,
+      description: "Docker configuration file"
+    },
+    {
+      pattern: /^\.?npmrc$/,
+      description: "NPM configuration file"
+    },
+    {
+      pattern: /^\.?env$/,
+      description: "Environment configuration file"
+    },
+    {
+      pattern: /credential/i,
+      description: "Credential dir in path"
+    },
+    {
+      pattern: /password/i,
+      description: "Password dir in path"
+    },
+  ].freeze
+  GLOBAL_ADDITION_MAX_SIZE = 100
+  GlOBAL_FINDING_MAX_SIZE = 100000
+  GLOBAL_SENSITIVE_WORDS = %w{
+      example
+      google
+      facebook
+      microsoft
+  }.freeze
+end
