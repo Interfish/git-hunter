@@ -13,6 +13,8 @@ Usage:
       run                                                                         - Analyse users in user_list.txt
       run user (<github_user_link> | <github_username>) [nickname]                - Analyse <github_username>'s all repositories, nickname is optional
       run repo (<github_repo_link> | (<github_username> <repo_name>)) [nickname]  - Analyse <github username>'s repo '<repo_name>', nickname is optional
+      run custom_link <custom_git_repo_link> [nickname]                           - Analyse git repo from custom link(e.g. gitlab)
+      run local <path_to_local_repo> [nickname]                                   - Analyse local git repo
       run global                                                                  - Global Seach for sensitive words in config
 
       report                                                                      - Generate html report for all users in DB
@@ -76,9 +78,15 @@ if ARGV[0] == 'run'
     end
     GitHunterCore.new(user, repo, ARGV[4]).run
     GitHunterRenderer.new(user, repo).run
+  elsif ARGV[1] == 'custom_link'
+    user, repo = GitHunterCore.new.run_custom_link(ARGV[2], ARGV[3])
+    GitHunterRenderer.new(user, repo).run
+  elsif ARGV[1] == 'local'
+    user, repo = GitHunterCore.new.run_local(ARGV[2], ARGV[3])
+    GitHunterRenderer.new(user, repo).run
   elsif ARGV[1] == 'global'
     GitHunterCore.new.run_global
-    GitHunterRenderer.new.run_global``
+    GitHunterRenderer.new.run_global
   else
     puts HELP
   end

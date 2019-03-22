@@ -4,6 +4,7 @@ require 'net/http'
 require 'active_record'
 require 'erb'
 require 'cgi'
+require 'uri'
 
 project_root = File.expand_path('..', __dir__).freeze
 require_relative project_root + '/config'
