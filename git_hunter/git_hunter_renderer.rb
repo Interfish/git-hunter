@@ -13,8 +13,11 @@ class GitHunterRenderer < GitHunterBase
     # ActiveRecord::Base.logger = Logger.new(STDOUT)
   end
 
-  def run
+  def run(console_print=false)
     get_result
+    if console_print
+      print_in_console
+    end
     report = ERB.new(@template_html)
     result = report.result(get_binding)
     # file_name = 'test.html'
@@ -59,7 +62,7 @@ class GitHunterRenderer < GitHunterBase
     @finding_count = findings.count.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
   end
 
-  def run_global
+  def run_global(console_print=false)
     @template_html = File.open([GIT_HUNTER_ROOT, 'git_hunter', 'templates', 'global_report.html.erb'].join('/')).read
     @template_css = File.open([GIT_HUNTER_ROOT, 'git_hunter', 'templates', 'global_report.css'].join('/')).read
     get_global_result
@@ -76,6 +79,31 @@ class GitHunterRenderer < GitHunterBase
   def get_global_result
     @words = GlobalFindingWord.includes(:global_findings).where('global_findings.is_valid = ?', true).references(:global_findings)
     @global_findings = GlobalFinding.where(is_valid: true)
+  end
+
+  def print_in_console
+    GitHunterBase.logger.result '------------------------ Result --------------------------'
+    @result.each do |repo|
+      GitHunterBase.logger.result '==============================='
+      GitHunterBase.logger.result 'User: ' + repo.user.github_user_name.to_s
+      GitHunterBase.logger.result 'Nickname' + repo.user.nickname.to_s
+      GitHunterBase.logger.result 'Repo: ' + repo.repo_name.to_s
+      repo.blobs.each do |blob|
+        GitHunterBase.logger.result "\n"
+        GitHunterBase.logger.result '>>>>>>>>>>>>>>>>>>>>>>>'
+        GitHunterBase.logger.result 'File: ' + blob.file_path.to_s
+        GitHunterBase.logger.result 'SHA: ' + blob.sha.to_s
+        GitHunterBase.logger.result 'Earliest Commit: ' + blob.earliest_commit_sha.to_s
+        GitHunterBase.logger.result ''
+        blob.findings.each do |finding|
+          GitHunterBase.logger.result "\n"
+          GitHunterBase.logger.result 'Line: ' + finding.line_no.to_s
+          GitHunterBase.logger.result '*********************************************'
+          GitHunterBase.logger.result finding.content.to_s
+          GitHunterBase.logger.result '*********************************************'
+        end
+      end
+    end
   end
 
   private

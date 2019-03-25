@@ -2,7 +2,12 @@
 require_relative 'git_hunter/git_hunter_base'
 
 HELP = <<~HELP
-
+   ______ _  __   __  __               __               
+  / ____/(_)/ /_ / / / /__  __ ____   / /_ ___   _____  
+ / / __ / // __// /_/ // / / // __ \\ / __// _ \\ / ___/
+/ /_/ // // /_ / __  // /_/ // / / // /_ /  __// /      
+\\____//_/ \\__//_/ /_/ \\__,_//_/ /_/ \\__/ \\___//_/  
+                                                        
 Usage:
     Action explanation:
       run    - execute analysing process
@@ -80,10 +85,10 @@ if ARGV[0] == 'run'
     GitHunterRenderer.new(user, repo).run
   elsif ARGV[1] == 'custom_link'
     user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_custom_link(ARGV[2])
-    GitHunterRenderer.new(user, repo).run
+    GitHunterRenderer.new(user, repo).run(console_print=true)
   elsif ARGV[1] == 'local'
     user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_local(ARGV[2])
-    GitHunterRenderer.new(user, repo).run
+    GitHunterRenderer.new(user, repo).run(console_print=true)
   elsif ARGV[1] == 'global'
     GitHunterCore.new.run_global
     GitHunterRenderer.new.run_global

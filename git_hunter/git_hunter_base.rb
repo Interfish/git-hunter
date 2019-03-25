@@ -65,6 +65,10 @@ class GitHunterBase
       def info(message)
         puts '[Info]  ' + message.to_s
       end
+
+      def result(message)
+        puts message.to_s
+      end
     end
   end
 
