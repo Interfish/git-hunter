@@ -28,17 +28,20 @@ class GitHunterCore < GitHunterBase
   def run_custom_link(link)
     create_user_and_repo_for_custom_path_or_link
     @repo.prepare_local_repo(nil, link)
+    @repo.analyse
     return @user_name, @repo_name
   end
 
   def run_local(path)
     create_user_and_repo_for_custom_path_or_link
     @repo.prepare_local_repo(path, nil)
+    @repo.analyse
     return @user_name, @repo_name
   end
 
   def create_user_and_repo_for_custom_path_or_link
     @user_name = Time.now.utc.strftime('temp_user@%Y%m%d%H%M%S')
+    @repo_name = Time.now.utc.strftime('temp_repo@%Y%m%d%H%M%S')
     @user = User.where(github_user_name: @user_name).first_or_create!
     @user.update!(nickname: @nickname) if @nickname.present?
     Time.now.utc.strftime('temp_user@%Y%m%d%H%M%S')

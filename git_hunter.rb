@@ -82,7 +82,7 @@ if ARGV[0] == 'run'
     user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_custom_link(ARGV[2])
     GitHunterRenderer.new(user, repo).run
   elsif ARGV[1] == 'local'
-    user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_local(ARGV[2], ARGV[3])
+    user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_local(ARGV[2])
     GitHunterRenderer.new(user, repo).run
   elsif ARGV[1] == 'global'
     GitHunterCore.new.run_global
