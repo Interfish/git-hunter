@@ -47,7 +47,7 @@
               <div class="col-1"><%= repo.user.github_user_name %></div>
               <div class="col-2"><%= repo.user.nickname %></div>
               <div class="col-3"><%= repo.repo_name %></div>
-              <div class="col-4"><a target="_blank" rel="noopener noreferrer" href="<%= ['https://github.com', repo.user.github_user_name, repo.repo_name].join('/') %>"><%= ['https://github.com', repo.user.github_user_name, repo.repo_name].join('/') %></a></div>
+              <div class="col-4"><a target="_blank" rel="noopener noreferrer" href="<%= repo.repo_link %>"><%= repo.repo_link %></a></div>
               <div class="content" style="display:none;">
                 <div class="content-head">Findings in <%= repo.user.github_user_name %>/<%= repo.repo_name %>,  Nickname: <%= repo.user.nickname %></div>
                 <div class="content-body">
@@ -59,8 +59,8 @@
                         <br>Earliest Commit:&emsp;&nbsp;&nbsp;<%= blob.earliest_commit_sha %>
                       </div>
                       <div>
-                        <div class="github-button" style="background-color:#e67a00;color:white;width:170px;" onclick="window.open('https://github.com/<%= [repo.user.github_user_name, repo.repo_name, 'blob', blob.earliest_commit_sha, blob.file_path].join('/') %>');">View file on GitHub</div>
-                        <div class="github-button" style="background-color:#bdbdbd;color:black;width:200px;" onclick="window.open('https://github.com/<%= [repo.user.github_user_name, repo.repo_name, 'commit', blob.earliest_commit_sha].join('/') %>');">View commit on Github</div>
+                        <div class="github-button" style="background-color:#e67a00;color:white;width:170px;" onclick="<%= blob.file_link %>">View file on GitHub</div>
+                        <div class="github-button" style="background-color:#bdbdbd;color:black;width:200px;" onclick="<%= blob.commit_link %>">View commit on Github</div>
                       </div>
                       <div class="blob-body">
                         <% blob.findings.each do |finding| %>

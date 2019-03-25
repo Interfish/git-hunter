@@ -71,6 +71,18 @@ class Repo < ApplicationRecord
     [GitHunterBase.root, GitHunterBase.repo_dir, user.github_user_name, repo_name].join('/')
   end
 
+  def temp_repo?
+    repo_name.start_with?('temp_repo@')
+  end
+
+  def repo_link
+    if temp_repo?
+      'Temp Repo, No Link'
+    else
+      [GitHunterBase::GITHUB_HTTPS_PREFIX, user.github_user_name, repo_name].join('/')
+    end
+  end
+
   private
 
   def blobs_in_repo
