@@ -41,6 +41,8 @@ Examples:
       run user https://github.com/abc batman                                      - Same as above
       run repo abc def                                                            - Analyse abc's repo def
       run repo https://github.com/abc/def                                         - Same as above
+      run local /path/to/some/git/repo                                            - Analyse local repo
+      run custom_link https://gitlab.com/abc/def                                  - Analyse some repo on gitlab
       report user abc                                                             - Report findings of abc
       report repo abc def                                                         - Report findings in abc's repo def
       mark user abc                                                               - Mark findings of user abc as false positive
