@@ -21,7 +21,7 @@ $ gem install bundle
 Then:
 
 ```shell
-$ bundle install
+$ cd /path/to/git_hunter && bundle install
 ```
 
 
@@ -29,6 +29,24 @@ $ bundle install
 ## Usage
 
 Git-Hunter main functions: 
+
+#### 0. Scan single local/remote git repository
+
+Though Git-Hunter is made for monitoring Github, many people only demand to temporarily scan a local/remote repository. No problem, Git-Hunter totally support that. But before you go, please read the configuration part in below and make sure you properly set `SENSITIVE_WORDS`. 
+
+For single local repo, you can:
+
+```shell
+    $ ruby ./git_hunter.rb run local /path/to/local/git/repo
+```
+
+For single remote repo, you can(make sure you have access to that remote repo):
+
+```shell
+    $ ruby ./git_hunter.rb run custom_link https://gitlab.com/some/repo
+```
+
+Then wait before scanning finish. Report will be generated under `report` folder.
 
 #### 1. Monitor Specified Github users.
 
@@ -73,7 +91,7 @@ SENSITIVE_WORDS = %w{
 
 Git-Hunter will use regular expression to match these words. Some try to think of some highly representative words you care about.
 
-One more thing, don't forget to add [Github personal access token](https://github.com/settings/tokens), it's necessary for Git-Hunter to work:
+One more thing, don't forget to add [Github personal access token](https://github.com/settings/tokens):
 
 ```ruby
 # config.rb
@@ -92,14 +110,14 @@ Git-Hunter will automatically clone and analyse all users' repositories as liste
 
 If you wish to analyse only one user,  just:
 
-```bash
+```shell
 $ ruby ./git_hunter.rb run user Interfish [some_nickname]
 or
 $ ruby ./git_hunter.rn run user https://github.com/Interfish [some_nickname]
 # nickname is optional
 ```
 
-One repo:
+Single GitHub repo:
 
 ```shell
 $ ruby ./git_hunter.rb run repo Interfish git-hunter [some_nickname]
@@ -156,7 +174,7 @@ $ ruby ./git_hunter.rb report all
 
 #### 4. Global search across the whole Github
 
-You can't always include all users in your list. Usually some out-of-list users will do bad things, e.g. new employee who haven't submit their github url, your opponent, dark industry. Global search becomes extremly useful at this time.
+You can't always include all users in your list. Usually some out-of-list users will do bad things, e.g. new employee who haven't submit their github url, opponent company, dark industry. Global search becomes extremly useful at this time.
 
 First, configure `config.rb`:
 
@@ -172,7 +190,7 @@ GLOBAL_SENSITIVE_WORD = %w{
 }
 ```
 
-And then run:
+And run:
 
 ```shell
 $ ruby ./git_hunter.rb run global
@@ -238,7 +256,7 @@ You may have noticed there's dozens of configuration in `config.rb`. To maximize
 
 
 
-## Advanced Managing DB
+## Interacting with DB
 
 Git-Hunter use ActiveRecord to reflect DB. So, if you know how to use Ruby, you can:
 

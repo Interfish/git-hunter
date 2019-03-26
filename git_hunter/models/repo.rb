@@ -4,20 +4,31 @@ class Repo < ApplicationRecord
 
   scope :exist, -> { where('deleted_at IS NULL') }
 
-  def prepare_local_repo
-    if Dir.exist? repo_path
-      `cd #{repo_path} && git fetch -n --all`
+  def prepare_local_repo(custom_repo_path=nil, custom_repo_git_url=nil)
+    @repo_git_url = custom_repo_git_url || repo_git_url
+    if !custom_repo_path.nil?
+      if Dir.exist? custom_repo_path
+        @repo_path = custom_repo_path
+      else
+        raise GitHunterBase::GitHunterError, 'Git repo path invalid'
+      end
     else
-      `mkdir -p #{user_path} && git clone #{repo_git_url} #{repo_path}`
+      raise GitHunterBase::GitHunterError, 'Git URL Invalid' if !( @repo_git_url =~ URI::regexp)
+      if Dir.exist? repo_path
+        `cd #{repo_path} && git fetch -n --all`
+      else
+        `mkdir -p #{user_path} && git clone #{@repo_git_url} #{repo_path}`
+      end
+      @repo_path = repo_path
     end
   end
 
   def analyse
     GitHunterBase.logger.info '======================================================================'
-    GitHunterBase.logger.info 'Github user: ' + user.github_user_name
+    GitHunterBase.logger.info 'User: ' + user.github_user_name
     GitHunterBase.logger.info 'Nickname: ' + (user.nickname || 'nil')
     GitHunterBase.logger.info 'Repo: ' + repo_name
-    @repo_rugged = Rugged::Repository.new(repo_path)
+    @repo_rugged = Rugged::Repository.new(@repo_path)
 
     db_blobs = blobs.exist.pluck(:sha)
     repo_blobs_hash = blobs_in_repo
@@ -58,6 +69,18 @@ class Repo < ApplicationRecord
 
   def repo_path
     [GitHunterBase.root, GitHunterBase.repo_dir, user.github_user_name, repo_name].join('/')
+  end
+
+  def temp_repo?
+    repo_name.start_with?('temp_repo@')
+  end
+
+  def repo_link
+    if temp_repo?
+      'Temp Repo, No Link'
+    else
+      [GitHunterBase::GITHUB_HTTPS_PREFIX, user.github_user_name, repo_name].join('/')
+    end
   end
 
   private
