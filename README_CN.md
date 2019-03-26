@@ -117,15 +117,9 @@ $ ruby ./git_hunter.rn run user https://github.com/Interfish [别名]
 单个 GitHub 仓库:
 
 ```shell
-<<<<<<< HEAD
 $ ruby ./git_hunter.rb run repo Interfish git-hunter [别名]
 or
 $ ruby ./git_hunter.rb run repo https://github.com/Interfish/git-hunter [别名]
-=======
-$ ruby ./git_hunter.rb run user Interfish git-hunter [别名]
-or
-$ ruby ./git_hunter.rb run user https://github.com/Interfish/git-hunter [别名]
->>>>>>> d707f0ea2bdb653f232564c5e9558fb65679c9aa
 # nickname is optional
 ```
 
