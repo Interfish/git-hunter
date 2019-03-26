@@ -1,38 +1,57 @@
 # Git-Hunter
 
-A tool to monitor possible key-leaks on Github, made by Ruby.
+GitHub 监控扫描器，扫描 Git 仓库中的密码泄漏或敏感词。
 
-## Introduction
+## 介绍
 
-If you come from a company or an organization, and you are headache about your employee uploading some sensitive code to their own GitHub, e.g. AWS keys, DB password, company project code, you are in the right place. Git-Hunter is aimed to establish a monitor system to inform you at the first time once those bad things happen. 
+很多公司和机构都发生过类似的安全事件：员工不小心将密钥和敏感信息写入了代码，并上传到了 Github 上。此工具就是为这样的场景准备的。Git-Hunter 是一个自动监控系统，它深入 Git 的提交历史挖掘潜在的泄漏信息，并用漂亮易读的报告将其展示出来。
 
 ![Git-Hunter](example1.png)
 
-## Installation
+## 安装
 
-Of course, you need a [Ruby](https://www.ruby-lang.org/en/documentation/installation/).
+首先，你需要安装 [Ruby](https://www.ruby-lang.org/en/documentation/installation/).
 
-Also, you need a bundle installed. After installing Ruby:
+在安装完成 Ruby 之后，安装 bundle:
 
 ```shell
 $ gem install bundle
 ```
 
-Then:
+然后通过 bundle 安装所需要的 gem:
 
 ```shell
-$ bundle install
+$ cd /path/to/git_hunter &&  bundle install
 ```
 
 
 
-## Usage
+## 使用说明
 
-Git-Hunter main functions: 
+Git-Hunter 主要功能: 
 
-#### 1. Monitor Specified Github users.
+#### 0. 扫描单个远程/本地仓库
 
-First:
+尽管 Git-Hunter 是为了 Github 监控而定制的，但是很多用户只是希望临时的扫描单个本地/远程的仓库而已。没问题，Git-Hunter 提供了这样的功能。 不过首先，请阅读其他章节中的配置部分，确保你将感兴趣的关键词 `SENSITIVE_WORDS` 设定完毕。
+
+对于单个本地的仓库，你可以:
+
+```shell
+    $ ruby ./git_hunter.rb run local /path/to/local/git/repo
+```
+
+对于单个远程仓库中，你可以(需要确保你有权限拉取该远程仓库):
+
+```shell
+    $ ruby ./git_hunter.rb run custom_link https://gitlab.com/some/repo
+```
+
+等待扫描完毕，相关的报告将会在 `report` 文件夹下生成。
+
+
+#### 1. 监控指定的 Github 用户
+
+首先:
 
 ```shell
 $ cp user_list.txt.example user_list.txt
@@ -40,24 +59,22 @@ $ cp config.rb.example config.rb
 $ vim user_list.txt
 ```
 
-and add some Github users you wish to be monitored, one line each, for example:
+然后添加一些你想要监控的 GitHub 用户，每行一个:
 
 ```shell
 # user_list.txt
-Interfish superman # 1st column is Github username, 2nd column is nickname(optional)
-https://github.com/rails batman # link is also supported
-octocat # no nickname? fine
+Interfish superman # 第一行为 GitHub 的用户名，第二行为该用户的别名（可选参数）
+https://github.com/rails batman # 第一行也可以是该用户的 github 的链接
+octocat # 没有别名？完全没问题
 ```
 
-What's nickname? If you wish to set relation between GitHub user and some name in your company's personnel system, e.g. employee's real name, employee's job number, it could be convenient. No nickname is totally fine.  Just leave it blank. 
+什么是别名？很多时候，你都需要将员工在公司中的名字和 github 用户名对应起来。为了使审阅报告更加方便，你可以给某个人设置别名。没有别名也没有关系，只要留空就好了。
 
+接下来需要设定一些参数。**Git-Hunter 会试图在仓库中寻找两样东西 - 敏感词和泄漏密钥。** 他们都在 `config.rb` 中设置。
 
+泄漏密钥的配置在 `KEY_WORDS` 中，对于大多数用户来讲，初始的设定已经够用了，所以一般没有必要变更。
 
-Then you may like to add some self-defined config. **Git-Hunter will try to find two things in repos - sensitive words and possible key-leaks**, and they are all in `config.rb`. 
-
-Config for key-leaks is in `KEY_WORDS` and it's common to all users , so you don't need to change it at the first time. 
-
-`SENSITIVE_WORDS` varys a lot. If you are from Google,  some of your company's project are named 'abc', 'def' and 'ghi', and some of your company's domain are 'dada.com', 'pope.com', you can add following items:
+敏感词的设定则大为不同。假设你是 Google 的员工，你们公司中的一些项目被命名为了 'abc'、'def' 以及 'ghi'，并且公司的一些内部域名为 'dada.com' 以及 'pope.com'。这时候，你可以添加以下设置:
 
 ```ruby
 # config.rb
@@ -71,40 +88,38 @@ SENSITIVE_WORDS = %w{
 }
 ```
 
-Git-Hunter will use regular expression to match these words. Some try to think of some highly representative words you care about.
+Git-Hunter 会使用正则表达式来匹配这些关键词。因此，尝试想一些非常有代表性的、你非常关心的敏感词，这会直接影响到搜索的结果。
 
-One more thing, don't forget to add [Github personal access token](https://github.com/settings/tokens), it's necessary for Git-Hunter to work:
+最后一件事，别忘了设置 [Github personal access token](https://github.com/settings/tokens):
 
 ```ruby
 # config.rb
 GITHUB_OAUTH_TOKEN = 'your github access token'.freeze
 ```
 
-Ok! Time to Run,  just:
+好了！准备开始扫描，执行:
 
 ```shell
 $ ruby ./git_hunter.rb run
 ```
 
-Git-Hunter will automatically clone and analyse all users' repositories as listed in `user_list.txt` . When it finish, it will generate a HTML report and highlight the findings, if there is any.
+Git-Hunter 会自动的拉取 user_list.txt 中所有用户的仓库并分析。结束之后会生成一份 HTML 报告，并高亮潜在的泄漏点。
 
+如果你只想扫描单个用户:
 
-
-If you wish to analyse only one user,  just:
-
-```bash
-$ ruby ./git_hunter.rb run user Interfish [some_nickname]
+```shell
+$ ruby ./git_hunter.rb run user Interfish [别名]
 or
-$ ruby ./git_hunter.rn run user https://github.com/Interfish [some_nickname]
+$ ruby ./git_hunter.rn run user https://github.com/Interfish [别名]
 # nickname is optional
 ```
 
-One repo:
+单个 GitHub 仓库:
 
 ```shell
-$ ruby ./git_hunter.rb run repo Interfish git-hunter [some_nickname]
+$ ruby ./git_hunter.rb run repo Interfish git-hunter [别名]
 or
-$ ruby ./git_hunter.rb run repo https://github.com/Interfish/git-hunter [some_nickname]
+$ ruby ./git_hunter.rb run repo https://github.com/Interfish/git-hunter [别名]
 # nickname is optional
 ```
 
@@ -255,4 +270,3 @@ finding = Finding.where(id: 2).first
 finding.update(is_valid: false) # mark this finding as false positive
 ...
 ```
-
