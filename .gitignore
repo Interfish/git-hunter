@@ -1,7 +1,8 @@
-reports
-repos
+reports/*
+repos/*
+!reports/.keep
+!repos/.keep
 .DS_Store
-Gemfile.lock
 *.sqlite3
 user_list.txt
 config.rb

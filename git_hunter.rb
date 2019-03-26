@@ -2,7 +2,12 @@
 require_relative 'git_hunter/git_hunter_base'
 
 HELP = <<~HELP
-
+   ______ _  __   __  __               __               
+  / ____/(_)/ /_ / / / /__  __ ____   / /_ ___   _____  
+ / / __ / // __// /_/ // / / // __ \\ / __// _ \\ / ___/
+/ /_/ // // /_ / __  // /_/ // / / // /_ /  __// /      
+\\____//_/ \\__//_/ /_/ \\__,_//_/ /_/ \\__/ \\___//_/  
+                                                        
 Usage:
     Action explanation:
       run    - execute analysing process
@@ -13,6 +18,8 @@ Usage:
       run                                                                         - Analyse users in user_list.txt
       run user (<github_user_link> | <github_username>) [nickname]                - Analyse <github_username>'s all repositories, nickname is optional
       run repo (<github_repo_link> | (<github_username> <repo_name>)) [nickname]  - Analyse <github username>'s repo '<repo_name>', nickname is optional
+      run custom_link <custom_git_repo_link> [nickname]                           - Analyse git repo from custom link(e.g. gitlab)
+      run local <path_to_local_repo> [nickname]                                   - Analyse local git repo
       run global                                                                  - Global Seach for sensitive words in config
 
       report                                                                      - Generate html report for all users in DB
@@ -34,6 +41,8 @@ Examples:
       run user https://github.com/abc batman                                      - Same as above
       run repo abc def                                                            - Analyse abc's repo def
       run repo https://github.com/abc/def                                         - Same as above
+      run local /path/to/some/git/repo                                            - Analyse local repo
+      run custom_link https://gitlab.com/abc/def                                  - Analyse some repo on gitlab
       report user abc                                                             - Report findings of abc
       report repo abc def                                                         - Report findings in abc's repo def
       mark user abc                                                               - Mark findings of user abc as false positive
@@ -76,9 +85,15 @@ if ARGV[0] == 'run'
     end
     GitHunterCore.new(user, repo, ARGV[4]).run
     GitHunterRenderer.new(user, repo).run
+  elsif ARGV[1] == 'custom_link'
+    user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_custom_link(ARGV[2])
+    GitHunterRenderer.new(user, repo).run(console_print=true)
+  elsif ARGV[1] == 'local'
+    user, repo = GitHunterCore.new(nil, nil,  ARGV[3]).run_local(ARGV[2])
+    GitHunterRenderer.new(user, repo).run(console_print=true)
   elsif ARGV[1] == 'global'
     GitHunterCore.new.run_global
-    GitHunterRenderer.new.run_global``
+    GitHunterRenderer.new.run_global
   else
     puts HELP
   end

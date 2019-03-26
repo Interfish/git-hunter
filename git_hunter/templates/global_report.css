@@ -124,6 +124,8 @@ a {color: white;}
     background-color: #6f0606;
     border-radius: 10px;
     padding: 10px 0px 10px 20px;
+    overflow-x: auto;
+    white-space: nowrap;
 }
 .content-body{
     margin: 25px 10px 10px 20px;
